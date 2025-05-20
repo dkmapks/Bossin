@@ -1,194 +1,78 @@
-class CasinoGame {
-    constructor() {
-        this.balance = 1000;
-        this.luck = 0;
-        this.creditDebt = 0;
-        this.luckCost = 1000;
-        this.range = 'None';
-        this.bonus = 0;
-        this.updateUI();
-    }
+let cash = 1000;
+let risk = 0;
+let backpack = 0;
+let maxBackpack = 50;
+let drugPrice = 10; // cena losowa
+let drugAmount = 0;
 
-    spin() {
-        if (this.balance < 100) {
-            this.showMessage("Not enough balance to spin.");
-            return;
-        }
-        this.balance -= 100;
-        const winChance = Math.random() * (1 + this.luck / 100);
-        if (winChance > 0.5) {
-            const winnings = Math.floor(Math.random() * 901) + 100 + this.bonus;
-            this.balance += winnings;
-            this.showMessage(`You won $${winnings}!`);
-        } else {
-            this.showMessage("You lost this spin.");
-        }
-        this.updateUI();
-    }
-
-    buyLuck() {
-        if (this.balance < this.luckCost) {
-            this.showMessage("Not enough balance to buy luck.");
-            return;
-        }
-        this.balance -= this.luckCost;
-        this.luck += 1;
-        this.luckCost *= 2;
-        this.showMessage(`Luck increased! New luck: ${this.luck}%`);
-        this.updateUI();
-    }
-
-    takeCredit() {
-        const amount = parseInt(prompt("Enter credit amount (100 - 10000):"), 10);
-        if (isNaN(amount) || amount < 100 || amount > 10000) {
-            this.showMessage("Invalid credit amount.");
-            return;
-        }
-        this.balance += amount;
-        this.creditDebt += amount * 3;
-        this.showMessage(`Credit taken: $${amount}. You owe: $${this.creditDebt}`);
-        this.updateUI();
-    }
-
-    repayCredit() {
-        const amount = parseInt(prompt("Enter amount to repay:"), 10);
-        if (isNaN(amount) || this.balance < amount) {
-            this.showMessage("Invalid repayment amount.");
-            return;
-        }
-        this.balance -= amount;
-        this.creditDebt -= amount;
-        this.showMessage(`Credit repaid: $${amount}. Remaining debt: $${this.creditDebt}`);
-        this.updateUI();
-    }
-
-    buyItem(item) {
-        const items = {
-            car: { price: 5000, range: 'Small Rich', bonus: 200 },
-            jewelry: { price: 50000, range: 'Big Rich', bonus: 2000 },
-            house: { price: 1000000, range: 'Millionaire', bonus: 25000 }
-        };
-        if (!items[item]) {
-            this.showMessage("Invalid item.");
-            return;
-        }
-        if (this.balance < items[item].price) {
-            this.showMessage("Not enough balance to buy item.");
-            return;
-        }
-        this.balance -= items[item].price;
-        this.range = items[item].range;
-        this.bonus = items[item].bonus;
-        this.showMessage(`You bought a ${item} for $${items[item].price}.`);
-        this.updateUI();
-    }
-
-    saveGame() {
-        const gameState = {
-            balance: this.balance,
-            luck: this.luck,
-            creditDebt: this.creditDebt,
-            luckCost: this.luckCost,
-            range: this.range,
-            bonus: this.bonus
-        };
-        localStorage.setItem('casinoGameState', JSON.stringify(gameState));
-        this.showMessage("Game saved.");
-    }
-
-    loadGame() {
-        const gameState = JSON.parse(localStorage.getItem('casinoGameState'));
-        if (gameState) {
-            this.balance = gameState.balance;
-            this.luck = gameState.luck;
-            this.creditDebt = gameState.creditDebt;
-            this.luckCost = gameState.luckCost;
-            this.range = gameState.range;
-            this.bonus = gameState.bonus;
-            this.showMessage("Game loaded.");
-            this.updateUI();
-        } else {
-            this.showMessage("No saved game found.");
-        }
-    }
-
-    showModMenuPrompt() {
-        const code = prompt("Enter the mod menu code:");
-        if (code === '7432') {
-            document.getElementById('mod-menu').style.display = 'block';
-            this.showMessage("Mod menu unlocked.");
-        } else {
-            this.showMessage("Incorrect code.");
-        }
-    }
-
-    addBalance(amount) {
-        this.balance += amount;
-        this.showMessage(`Added $${amount} to balance.`);
-        this.updateUI();
-    }
-
-    addLuck(amount) {
-        this.luck += amount;
-        this.showMessage(`Added ${amount}% luck.`);
-        this.updateUI();
-    }
-
-    updateUI() {
-        document.getElementById("balance").innerText = `Balance: $${this.balance}`;
-        document.getElementById("debt").innerText = `Debt: $${this.creditDebt}`;
-        document.getElementById("luck-cost").innerText = `Luck Cost: $${this.luckCost}`;
-        document.getElementById("luck-cost-display").innerText = `$${this.luckCost}`;
-        document.getElementById("range").innerText = `Range: ${this.range}`;
-    }
-
-    showMessage(message) {
-        const messageDiv = document.getElementById("message");
-        messageDiv.innerText = message;
-        setTimeout(() => {
-            messageDiv.innerText = "";
-        }, 3000);
-    }
+function updateUI() {
+  document.getElementById('cash').innerText = cash + ' N₽';
+  document.getElementById('risk').innerText = risk + '%';
+  document.getElementById('backpack').innerText = backpack + '/' + maxBackpack + 'g';
 }
 
-const game = new CasinoGame();
-
-function spin() {
-    game.spin();
+function log(message) {
+  const logDiv = document.getElementById('log');
+  logDiv.innerHTML = message + '<br>' + logDiv.innerHTML;
 }
 
-function buyLuck() {
-    game.buyLuck();
+function nextDay() {
+  // Losowa cena (np. 5-25)
+  drugPrice = Math.floor(Math.random() * 21) + 5;
+  log('Nowa cena narkotyków: ' + drugPrice + ' N₽/g');
+  // Ryzyko rośnie o 1-5%
+  const riskIncrease = Math.floor(Math.random() * 5) + 1;
+  risk = Math.min(100, risk + riskIncrease);
+  updateUI();
 }
 
-function takeCredit() {
-    game.takeCredit();
+function buyDrugs() {
+  const maxBuyable = Math.min(Math.floor(cash / drugPrice), maxBackpack - backpack);
+  if (maxBuyable <= 0) {
+    log('Nie możesz kupić więcej narkotyków!');
+    return;
+  }
+  const amount = Math.floor(Math.random() * maxBuyable) + 1;
+  const cost = amount * drugPrice;
+  cash -= cost;
+  backpack += amount;
+  log('Kupiono ' + amount + 'g za ' + cost + ' N₽');
+  updateUI();
 }
 
-function repayCredit() {
-    game.repayCredit();
-}
-
-function buyItem(item) {
-    game.buyItem(item);
+function sellDrugs() {
+  if (backpack <= 0) {
+    log('Nie masz co sprzedawać!');
+    return;
+  }
+  const amount = Math.floor(Math.random() * backpack) + 1;
+  const income = amount * drugPrice;
+  cash += income;
+  backpack -= amount;
+  log('Sprzedano ' + amount + 'g za ' + income + ' N₽');
+  updateUI();
 }
 
 function saveGame() {
-    game.saveGame();
+  const saveData = {
+    cash, risk, backpack
+  };
+  localStorage.setItem('narkoSave', JSON.stringify(saveData));
+  log('Gra zapisana!');
 }
 
 function loadGame() {
-    game.loadGame();
+  const save = localStorage.getItem('narkoSave');
+  if (!save) {
+    log('Brak zapisu gry!');
+    return;
+  }
+  const data = JSON.parse(save);
+  cash = data.cash;
+  risk = data.risk;
+  backpack = data.backpack;
+  log('Gra wczytana!');
+  updateUI();
 }
 
-function showModMenuPrompt() {
-    game.showModMenuPrompt();
-}
-
-function addBalance(amount) {
-    game.addBalance(amount);
-}
-
-function addLuck(amount) {
-    game.addLuck(amount);
-}
+updateUI();
