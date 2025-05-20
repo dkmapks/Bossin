@@ -1,36 +1,70 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+  background-color: #f5f7fa;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
 }
 
-.container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+#game-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
 }
 
-button {
-    margin: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 28px;
+  color: #1e88e5;
 }
 
-#message {
-    margin-top: 20px;
-    font-size: 18px;
-    color: green;
+#stats p {
+  margin-bottom: 8px;
+  font-size: 16px;
 }
 
-#mod-menu {
-    margin-top: 20px;
-    border-top: 1px solid #ccc;
-    padding-top: 10px;
+#actions {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#actions button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #1e88e5;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#actions button:hover {
+  background-color: #1565c0;
+}
+
+#log {
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 80px;
+  margin-top: 10px;
+  font-size: 14px;
+  overflow-y: auto;
+  max-height: 150px;
 }
